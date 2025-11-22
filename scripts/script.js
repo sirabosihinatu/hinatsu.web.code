@@ -1,31 +1,22 @@
+const DAY_OF_WEEK_TEXTS = ['日', '月', '火', '水', '木', '金', '土'];
+
 function getSpecificDayOfMonth(year, month, dayOfWeek, weekIndex, time) {
-    let date = new Date(year, month, 1);
+    const date = new Date(year, month, 1);
     let count = 0;
-    let day = -1;
 
     while (date.getMonth() === month) {
         if (date.getDay() === dayOfWeek) {
             count++;
             if (count === weekIndex) {
-                day = date.getDate();
-                break;
+                const eventDate = new Date(year, month, date.getDate());
+                return {
+                    date: eventDate,
+                    dayOfWeekText: DAY_OF_WEEK_TEXTS[dayOfWeek],
+                    time
+                };
             }
         }
         date.setDate(date.getDate() + 1);
-    }
-
-    if (day !== -1) {
-        const eventDate = new Date(year, month, day);
-        const dayOfWeekTexts = ['日', '月', '火', '水', '木', '金', '土'];
-        const dayOfWeekText = dayOfWeekTexts[dayOfWeek];
-
-        return {
-            date: eventDate,
-            dayOfWeekText: dayOfWeekText,
-            time: time,
-            dateString: `${eventDate.getFullYear()}/${String(eventDate.getMonth() + 1).padStart(2, '0')}/${String(day).padStart(2, '0')}`,
-            displayString: `${String(eventDate.getMonth() + 1).padStart(2, '0')}/${String(day).padStart(2, '0')}${dayOfWeekText} ${time}～`
-        };
     }
     return null;
 }
@@ -38,89 +29,83 @@ function generateCalendarData(yearsToLookAhead = 1) {
 
     for (let year = currentYear; year <= endYear; year++) {
         for (let month = 0; month < 12; month++) {
-            const secondFriday = getSpecificDayOfMonth(year, month, 5, 2, "22:00");
-            if (secondFriday) {
-                const eventDateWithTime = new Date(secondFriday.date);
-                eventDateWithTime.setHours(22, 0, 0, 0);
+            const events = [
+                { event: getSpecificDayOfMonth(year, month, 5, 2, "22:00"), hour: 22 },
+                { event: getSpecificDayOfMonth(year, month, 6, 4, "21:00"), hour: 21 }
+            ];
 
-                if (eventDateWithTime > today) {
-                    eventList.push(secondFriday);
+            events.forEach(({ event, hour }) => {
+                if (event) {
+                    const eventDateTime = new Date(event.date);
+                    eventDateTime.setHours(hour, 0, 0, 0);
+                    if (eventDateTime > today) {
+                        eventList.push(event);
+                    }
                 }
-            }
-
-            const fourthSaturday = getSpecificDayOfMonth(year, month, 6, 4, "21:00");
-            if (fourthSaturday) {
-                const eventDateWithTime = new Date(fourthSaturday.date);
-                eventDateWithTime.setHours(21, 0, 0, 0);
-
-                if (eventDateWithTime > today) {
-                    eventList.push(fourthSaturday);
-                }
-            }
+            });
         }
     }
 
-    eventList.sort((a, b) => a.date - b.date);
-
-    return eventList;
+    return eventList.sort((a, b) => a.date - b.date);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const futureEvents = generateCalendarData(1);
-    const container = document.getElementById('calendar-container');
+function formatDate(date) {
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return { month, day };
+}
 
-    if (!container) {
-        console.error('ID "calendar-container" が見つかりません。HTML側に設置してください。');
-        return;
+function createEventHTML(event, isHighlight = false) {
+    const { month, day } = formatDate(event.date);
+    const className = isHighlight ? 'event-item highlight-event' : 'event-item';
+    return `
+        <div class="${className}">
+            <span class="date">${month}/${day} ${event.dayOfWeekText}</span>
+            <span class="time">${event.time}～</span>
+        </div>
+    `;
+}
+
+function renderCalendar(events) {
+    if (events.length === 0) {
+        return '<p>現在のところ、予定されている開催日はありません。</p>';
     }
 
-    container.innerHTML = '';
-
-    if (futureEvents.length === 0) {
-        container.innerHTML = '<p>現在のところ、予定されている開催日はありません。</p>';
-        return;
-    }
-
-    const nextEvent = futureEvents[0];
-    const otherEvents = futureEvents.slice(1);
-
-    const nextEventHTML = `
+    const [nextEvent, ...otherEvents] = events;
+    let html = `
         <div class="calendar-section">
             <h3 class="section-title">直近の開催予定</h3>
-            <div class="event-item highlight-event">
-                <span class="date">${String(nextEvent.date.getMonth() + 1).padStart(2, '0')}/${String(nextEvent.date.getDate()).padStart(2, '0')} ${nextEvent.dayOfWeekText}</span>
-                <span class="time">${nextEvent.time}～</span>
-            </div>
+            ${createEventHTML(nextEvent, true)}
         </div>
     `;
 
-    let otherEventsHTML = `<div class="calendar-section other-events-section">`;
-    let currentYear = null;
-
-    otherEvents.forEach(event => {
-        const year = event.date.getFullYear();
-
-        if (year !== currentYear) {
-            if (currentYear !== null) {
-                otherEventsHTML += '</div>';
-            }
-            currentYear = year;
-            otherEventsHTML += `<h3 class="section-title event-year">${year}年</h3><div class="year-events-list">`;
-        }
-
-        otherEventsHTML += `
-            <div class="event-item">
-                <span class="date">${String(event.date.getMonth() + 1).padStart(2, '0')}/${String(event.date.getDate()).padStart(2, '0')}${event.dayOfWeekText}</span>
-                <span class="time">${event.time}～</span>
-            </div>
-        `;
-    });
-
     if (otherEvents.length > 0) {
-        otherEventsHTML += '</div></div>';
-    } else {
-        otherEventsHTML = '';
+        html += '<div class="calendar-section other-events-section">';
+        let currentYear = null;
+
+        otherEvents.forEach(event => {
+            const year = event.date.getFullYear();
+            if (year !== currentYear) {
+                if (currentYear !== null) html += '</div>';
+                currentYear = year;
+                html += `<h3 class="section-title event-year">${year}年</h3><div class="year-events-list">`;
+            }
+            html += createEventHTML(event);
+        });
+
+        html += '</div></div>';
     }
 
-    container.innerHTML = nextEventHTML + otherEventsHTML;
+    return html;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('calendar-container');
+    if (!container) {
+        console.error('ID "calendar-container" が見つかりません。');
+        return;
+    }
+
+    const futureEvents = generateCalendarData(1);
+    container.innerHTML = renderCalendar(futureEvents);
 });

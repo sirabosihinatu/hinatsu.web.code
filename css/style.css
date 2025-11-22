@@ -2,19 +2,22 @@ body {
     margin: 0;
     font-family: 'Arial', sans-serif;
     color: #333;
-    scroll-behavior: smooth; 
+    scroll-behavior: smooth;
 }
+
 h2 {
     text-align: center;
     padding: 20px 0;
     font-size: 2rem;
     color: #1a1a1a;
 }
+
 ul {
     list-style: none;
     padding: 0;
     margin: 0;
 }
+
 a {
     text-decoration: none;
     color: inherit;
@@ -24,22 +27,17 @@ a {
     text-align: center;
 }
 
-h2 {
-    text-align: center; 
-}
-
 .hero-section {
     position: relative;
 }
 
 .hero-image-container {
-    height: 100vh; 
-    position: relative; 
-    
+    height: 100vh;
+    position: relative;
     background-image: url("../assets/background.jpg");
-    background-size: cover; 
-    background-position: center; 
-    background-repeat: no-repeat; 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     z-index: 1;
 }
 
@@ -115,67 +113,17 @@ h2 {
     padding-bottom: 100px;
 }
 
-.staff-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 30px;
-    margin-top: 40px;
-}
-
-.staff-member {
+.note {
     text-align: center;
-    width: 120px;
-}
-
-.staff-member img {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #ff6347;
-}
-
-footer {
-    text-align: center;
-    padding: 20px;
-    background-color: #222;
-    color: #999;
-    font-size: 0.85rem;
-}
-
-.footer-links a {
-    color: #ccc;
-    margin: 0 10px;
-    transition: color 0.3s;
-}
-
-.footer-links a:hover {
-    color: #fff;
-}
-
-.calendar-wrapper * {
-    box-sizing: border-box;
-    font-family: sans-serif;
-}
-
-.calendar-wrapper {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
 }
 
 .main-title {
     text-align: center;
     font-size: 24px;
     margin-bottom: 5px;
-}
-
-.note {
-    text-align: center;
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 20px;
 }
 
 #calendar-container {
@@ -186,7 +134,7 @@ footer {
 }
 
 .calendar-section {
-    width: 100%;
+    width: 70%;
 }
 
 .section-title {
@@ -227,7 +175,7 @@ footer {
 
 .highlight-event {
     background-color: #e0e0e0;
-    font-size: 20px;
+    font-size: 24px;
     font-weight: bold;
     min-height: 100px;
     flex-basis: 300px;
@@ -235,19 +183,34 @@ footer {
 }
 
 .highlight-event .date {
-    font-size: 30px;
+    font-size: 34px;
 }
 
 .container {
     display: flex;
     justify-content: center;
     gap: 30px;
+    flex-wrap: wrap;
+}
+
+.staff-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    align-items: center;
+}
+
+.staff-row {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .item {
     display: flex;
     flex-direction: column;
-    align-items: center; 
+    align-items: center;
 }
 
 .circle-img {
@@ -256,11 +219,15 @@ footer {
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #ccc;
-    margin-bottom: 10px; 
+    margin-bottom: 10px;
 }
 
 .image-text {
     font-size: 16px;
     color: #333;
     margin: 0;
+}
+
+footer {
+    height: 100px;
 }
